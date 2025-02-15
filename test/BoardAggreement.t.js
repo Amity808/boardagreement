@@ -27,7 +27,7 @@ describe("BoardAgreement", async function () {
 
     const tokenBalance = await myToken.balanceOf(boardAgreement.target);
     console.log(await tokenBalance.toString(), "Token balance");
-    return { boardAgreement, owner, otherAccount, myToken, otherAccount1 };
+    return { boardAgreement, owner, otherAccount, myToken, otherAccount1, addressmember };
   }
 
   describe("Deployment", () => {
@@ -46,6 +46,20 @@ describe("BoardAgreement", async function () {
       );
       await expect(isBoardMember).to.be.true;
     });
+
+    it("It should return getboardMembers", async () => {
+        const { boardAgreement, owner, otherAccount, myToken, addressmember } =
+          await loadFixture(deployBoardAgreementFixture);
+        const isBoardMember = await boardAgreement.getboardMembers();
+        await expect(await boardAgreement.getboardMembers()).to.deep.equal(addressmember);
+      });
+
+      it("It should return getDecisionCount", async () => {
+        const { boardAgreement, owner, otherAccount, myToken, addressmember } =
+          await loadFixture(deployBoardAgreementFixture);
+        const isBoardMember = await boardAgreement.getboardMembers();
+        await expect(await boardAgreement.getDecisionCount()).to.be.equal(0);
+      });
 
     it("it should revert with custom error NOT_UNIQUE_BOARD_MEMBER", async () => {
       const { boardAgreement, owner, otherAccount, myToken, otherAccount1 } =
@@ -109,7 +123,7 @@ describe("BoardAgreement", async function () {
         await boardAgreement.connect(owner).submitDecision(owner.address, value, propsal);
         await boardAgreement.connect(owner).confirmDecision(0);
          await expect(boardAgreement.connect(owner).executeDecision(0)).to.be.revertedWithCustomError(boardAgreement,"ALLBOARD_MUST_CONFIRM()")
-        });
+    });
 
   })
 });
